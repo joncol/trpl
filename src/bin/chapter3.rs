@@ -9,6 +9,7 @@ fn main() {
     twelve_days_of_christmas()
 }
 
+#[allow(dead_code)]
 fn test_f_to_c() {
     println!("\nPlease input degrees Fahrenheit.");
     let mut f = String::new();
@@ -18,6 +19,7 @@ fn test_f_to_c() {
     println!("That equals {} degrees Celsius", c);
 }
 
+#[allow(dead_code)]
 fn test_c_to_f() {
     println!("\nPlease input degrees Celsius.");
     let mut c = String::new();
@@ -27,14 +29,17 @@ fn test_c_to_f() {
     println!("That equals {} degrees Fahrenheit", f);
 }
 
+#[allow(dead_code)]
 fn fahrenheit_to_celsius(f: i32) -> i32 {
     (f - 32) * 5 / 9
 }
 
+#[allow(dead_code)]
 fn celsius_to_fahrenheit(c: i32) -> i32 {
     c * 9 / 5 + 32
 }
 
+#[allow(dead_code)]
 fn test_fibonacci() {
     println!("1st Fibonacci number: {}", fibonacci(0));
     println!("2nd Fibonacci number: {}", fibonacci(1));
@@ -42,6 +47,7 @@ fn test_fibonacci() {
     println!("10th Fibonacci number: {}", fibonacci(9));
 }
 
+#[allow(dead_code)]
 fn fibonacci(n: u32) -> u32 {
     if n <= 1 {
         n
@@ -50,6 +56,7 @@ fn fibonacci(n: u32) -> u32 {
     }
 }
 
+#[allow(dead_code)]
 fn twelve_days_of_christmas() {
     let count_words = [
         "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eigth", "ninth",
@@ -71,8 +78,10 @@ fn twelve_days_of_christmas() {
     ];
 
     for i in 1..(items.len() + 1) {
-        println!("\nOn the {} day of Christmas my true love sent to me",
-                 count_words[i - 1]);
+        println!(
+            "\nOn the {} day of Christmas my true love sent to me",
+            count_words[i - 1]
+        );
         for j in (0..i).rev() {
             let and = if i > 1 && j == 0 { "And " } else { "" };
             let delim = if j == 0 { '.' } else { ',' };
