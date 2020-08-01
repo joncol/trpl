@@ -7,6 +7,14 @@ fn main() {
     println!("Mean is: {}", mean);
     println!("Median is: {}", median);
     println!("Mode is: {}", mode);
+
+    for s in ["first", "apple"].iter() {
+        println!("Pig latin of \"{}\" is \"{}\"", s, pig_latin(s));
+    }
+
+    for ch in "abcdefghi".chars() {
+        println!("{}: {}", ch, is_vowel(ch));
+    }
 }
 
 fn mean_median_mode(v: Vec<i32>) -> (f32, f32, i32) {
@@ -32,4 +40,25 @@ fn mean_median_mode(v: Vec<i32>) -> (f32, f32, i32) {
         .map(|(k, _v)| k);
 
     (mean, median, *mode.unwrap())
+}
+
+fn pig_latin(s: &str) -> String {
+    if is_vowel(s.chars().next().unwrap()) {
+        format!("{}-hay", s)
+    } else {
+        let first_char = s.chars().next().unwrap();
+        let but_first = s.chars()
+            .next()
+            .map(|c| &s[c.len_utf8()..])
+            .unwrap()
+            .to_string();
+        format!("{}-{}ay", but_first, first_char)
+    }
+}
+
+fn is_vowel(ch: char) -> bool {
+    match ch {
+        'a' | 'e' | 'i' | 'o' | 'u' => true,
+        _ => false,
+    }
 }
