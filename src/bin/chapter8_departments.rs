@@ -2,6 +2,7 @@ use cursive::traits::*;
 use cursive::views::{Button, Dialog, DummyView, EditView, LinearLayout, SelectView};
 use cursive::Cursive;
 use std::collections::HashMap;
+use std::rc::Rc;
 
 fn main() {
     let mut siv = cursive::default();
@@ -140,20 +141,20 @@ fn create_employee(s: &mut Cursive, department_name: &str) {
     fn ok(s: &mut Cursive, employee_name: &str, department_name: &str) {
         s.with_user_data(|departments: &mut HashMap<String, Vec<String>>| {
             let d = departments
-                .entry(String::from(department_name))
+                .entry(department_name.to_string())
                 .or_insert(Vec::new());
             d.push(employee_name.to_string());
         });
         s.pop_layer();
-        show_department(s, department_name);
+        show_department(s, &department_name);
     }
-    let dep_name1 = department_name.to_string();
-    let dep_name2 = department_name.to_string();
+    let dep_name_clone: Rc<str> = Rc::from(department_name);
+    let dep_name_clone2 = dep_name_clone.clone();
     s.add_layer(
         Dialog::around(
             EditView::new()
                 .on_submit(move |s, n| {
-                    ok(s, n, &dep_name1);
+                    ok(s, n, &dep_name_clone);
                 })
                 .with_name("name")
                 .fixed_width(40),
@@ -163,7 +164,7 @@ fn create_employee(s: &mut Cursive, department_name: &str) {
             let name = s
                 .call_on_name("name", |view: &mut EditView| view.get_content())
                 .unwrap();
-            ok(s, &name, &dep_name2);
+            ok(s, &name, &dep_name_clone2);
         })
         .button("Cancel", |s| {
             s.pop_layer();
