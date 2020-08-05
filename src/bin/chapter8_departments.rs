@@ -59,7 +59,7 @@ fn create_departments_list(s: &mut Cursive) -> Box<dyn View> {
     department_names.sort();
     select_view.add_all_str(department_names);
     let departments_view = select_view
-        .on_submit(show_department)
+        .on_submit(|s, d| show_department(s, d))
         .with_name("departments")
         .scrollable()
         .fixed_size((40, 5));
@@ -72,13 +72,15 @@ fn create_employees_view(s: &mut Cursive, department_name: &str) -> Box<dyn View
     let departments = s.user_data::<HashMap<String, Vec<String>>>().unwrap();
     select_view.add_all_str(departments.get(department_name).unwrap());
     let employees_view = select_view
-        .on_submit(show_department)
+        // .on_submit(show_department)
         .scrollable()
         .fixed_size((40, 10));
 
-    let employee_buttons = LinearLayout::vertical()
-        .child(Button::new("Add new", create_employee))
-        .child(Button::new("Remove", remove_employee));
+    let dep_name: String = department_name.to_string();
+    let employee_buttons = LinearLayout::vertical().child(Button::new("Add new", move |s| {
+        create_employee(s, &dep_name);
+    }));
+    // .child(Button::new("Remove", |s| remove_employee(s, department_name)));
 
     let layout = LinearLayout::horizontal()
         .child(employees_view)
@@ -104,7 +106,9 @@ fn show_department(s: &mut Cursive, department_name: &str) {
 fn create_department(s: &mut Cursive) {
     fn ok(s: &mut Cursive, department_name: &str) {
         s.with_user_data(|departments: &mut HashMap<String, Vec<String>>| {
-            departments.insert(String::from(department_name), Vec::new());
+            departments
+                .entry(String::from(department_name))
+                .or_insert(Vec::new());
         });
         s.pop_layer();
         create_departments_view(s);
@@ -132,31 +136,40 @@ fn create_department(s: &mut Cursive) {
 
 fn remove_department(s: &mut Cursive) {}
 
-fn create_employee(s: &mut Cursive) {
-    fn ok(s: &mut Cursive, name: &str) {
-        s.call_on_name("departments", |view: &mut SelectView<String>| {
-            view.add_item_str(name)
+fn create_employee(s: &mut Cursive, department_name: &str) {
+    fn ok(s: &mut Cursive, employee_name: &str, department_name: &str) {
+        s.with_user_data(|departments: &mut HashMap<String, Vec<String>>| {
+            let d = departments
+                .entry(String::from(department_name))
+                .or_insert(Vec::new());
+            d.push(employee_name.to_string());
         });
         s.pop_layer();
+        show_department(s, department_name);
     }
+    let dep_name1 = department_name.to_string();
+    let dep_name2 = department_name.to_string();
     s.add_layer(
         Dialog::around(
             EditView::new()
-                .on_submit(ok)
+                .on_submit(move |s, n| {
+                    ok(s, n, &dep_name1);
+                })
                 .with_name("name")
                 .fixed_width(40),
         )
-        .title("Create department")
-        .button("Ok", |s| {
+        .title(format!("Add employee to {}", department_name))
+        .button("Ok", move |s| {
             let name = s
                 .call_on_name("name", |view: &mut EditView| view.get_content())
                 .unwrap();
-            ok(s, &name);
+            ok(s, &name, &dep_name2);
         })
         .button("Cancel", |s| {
             s.pop_layer();
+            create_departments_view(s);
         }),
     );
 }
 
-fn remove_employee(s: &mut Cursive) {}
+fn remove_employee(s: &mut Cursive, department_name: &str) {}
